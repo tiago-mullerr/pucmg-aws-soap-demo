@@ -3,27 +3,38 @@ import './App.css';
 import { useState } from 'react';
 import Button from './components/Button/Button';
 import Input from './components/Input/Input';
-import { numberToWord } from './services/soap.service';
+import { celsiusToFahrenheit, lookupCity, parseXml } from './services/soap.service';
 
 function App() {
 
   const [query, setQuery] = useState('');
+  const [result, setResult] = useState('');
 
-  const setUserNameHandler = (e: any) => {
+  const setQueryHandler = (e: any) => {
     setQuery(e.target.value);
   }
 
-  const numberToWordHandler = (number: string) => {
-    numberToWord(number).then((response: any) => console.log(response));
+  const onParseComplete = (err: any, result: any) => {
+    if (err) {
+      throw err;
+    }
+    const json = JSON.stringify(result, null, 4);
+    const obj = JSON.parse(json);
+    setResult(json);
+    return obj;
+  }
+
+  const requestCompleteHandler = (response: any) => {
+    parseXml(response.response, onParseComplete);
   }
 
   const soapCallHandler = (type: any) => {
-    console.log(type);
     switch (type) {
-      case 'findByPerson':
-        numberToWordHandler(query);
+      case 'celsiustofahrenheit':
+        celsiusToFahrenheit(query, '', requestCompleteHandler);
         break;
-      case 'getByName':
+      case 'lookupCity':
+        lookupCity(query, 'http://tempuri.org/SOAP.Demo.LookupCity', requestCompleteHandler);
         break;
       case 'getListByName':
         break;
@@ -34,11 +45,12 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        <h1>Web Services e APIs - SOAP Requester</h1>
         <div className="flex-container">
-          <Input className="width-100" onChange={setUserNameHandler}></Input>
-          <Button onClick={soapCallHandler.bind(null, 'findByPerson')} classes="width-100">Get by Name</Button>
-          <Button onClick={soapCallHandler.bind(null, 'getByName')} classes="width-100">Get DataSet by Name</Button>
-          <Button onClick={soapCallHandler.bind(null, 'getListByName')} classes="width-100">Lookup City</Button>
+          <Input className="width-100" onChange={setQueryHandler}></Input>
+          <Button onClick={soapCallHandler.bind(null, 'celsiustofahrenheit')} classes="width-100">Convert to Celsius</Button>
+          <Button onClick={soapCallHandler.bind(null, 'lookupCity')} classes="width-100">Lookup City</Button>
+          <div className='result-container'>{result}</div>
         </div>
       </header>
     </div>
