@@ -1,0 +1,13 @@
+.textarea-result {
+    width: 100%;
+    margin-top: 15px;
+}
+.textarea-result label {
+    text-align: center;
+    text-transform: uppercase;
+}
+.textarea-result textarea {
+    width: 100%;
+    padding: 10px 0; 
+    height: 200px;
+}

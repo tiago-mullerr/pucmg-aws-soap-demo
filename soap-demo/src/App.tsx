@@ -1,9 +1,11 @@
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
 import Button from './components/Button/Button';
 import Input from './components/Input/Input';
-import { celsiusToFahrenheit, lookupCity, parseXml } from './services/soap.service';
+import TextArea from './components/TextArea/TextArea';
+import { celsiusToFahrenheit, lookupCity, getListByName, parseXml } from './services/soap.service';
 
 function App() {
 
@@ -14,18 +16,13 @@ function App() {
     setQuery(e.target.value);
   }
 
-  const onParseComplete = (err: any, result: any) => {
-    if (err) {
-      throw err;
-    }
-    const json = JSON.stringify(result, null, 4);
-    const obj = JSON.parse(json);
-    setResult(json);
-    return obj;
+  const requestCompleteHandler = (response: any) => { 
+  let resultado_json = parseXml(response.response);
+  if(resultado_json != null) {
+    setResult(resultado_json);
   }
-
-  const requestCompleteHandler = (response: any) => {
-    parseXml(response.response, onParseComplete);
+ 
+  return resultado_json; 
   }
 
   const soapCallHandler = (type: any) => {
@@ -37,9 +34,11 @@ function App() {
         lookupCity(query, 'http://tempuri.org/SOAP.Demo.LookupCity', requestCompleteHandler);
         break;
       case 'getListByName':
+        getListByName(query, 'http://tempuri.org/SOAP.Demo.GetListByName', requestCompleteHandler);
         break;
     }
   }
+  console.log(requestCompleteHandler);
 
   return (
     <div className="App">
@@ -50,7 +49,8 @@ function App() {
           <Input className="width-100" onChange={setQueryHandler}></Input>
           <Button onClick={soapCallHandler.bind(null, 'celsiustofahrenheit')} classes="width-100">Convert to Celsius</Button>
           <Button onClick={soapCallHandler.bind(null, 'lookupCity')} classes="width-100">Lookup City</Button>
-          <div className='result-container'>{result}</div>
+          <Button onClick={soapCallHandler.bind(null, 'getListByName')} classes="width-100">Get List By Name</Button>
+          <TextArea name="result" id="result" label="result:" value={ result } onChange= {(e) => {setResult(e.target.value)}}/>
         </div>
       </header>
     </div>
@@ -58,3 +58,7 @@ function App() {
 }
 
 export default App;
+// function parsedObject(response: any, onParseComplete: (err: any, result: any) => any) {
+//   throw new Error('Function not implemented.');
+// }
+
