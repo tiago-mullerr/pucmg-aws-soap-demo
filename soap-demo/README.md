@@ -1,4 +1,4 @@
-# Tiago Muller e Kauane Cordeiro
+# Developed by Tiago Muller e Kauane Cordeiro
 
 # Getting Started with Create React App
 
